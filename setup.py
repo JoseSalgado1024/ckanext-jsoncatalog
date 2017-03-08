@@ -9,6 +9,9 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
+with open("requirements.txt") as f:
+    requirements = [req.strip() for req in f.readlines()]
+
 setup(
     name='''ckanext-jsoncatalog''',
 
@@ -17,7 +20,7 @@ setup(
     # http://packaging.python.org/en/latest/tutorial.html#version
     version='0.0.1',
 
-    description='''"Publicacion de catalogo en formato data.json"''',
+    description='''"Publicación de catalogo en formato data.json"''',
     long_description=long_description,
 
     # The project's main homepage.
@@ -28,7 +31,7 @@ setup(
     author_email='''jose.salgado.wrk@gmail.com''',
 
     # Choose your license
-    license='AGPL',
+    license='MIT',
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
@@ -46,7 +49,6 @@ setup(
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
     ],
-
 
     # What does your project relate to?
     keywords='''CKAN "catalog W3C DCAT data.json"''',
@@ -78,10 +80,10 @@ setup(
     # "scripts" keyword. Entry points provide cross-platform support and allow
     # pip to create the appropriate form of executable for the target platform.
     entry_points='''
-        [ckan.plugins]
-        jsoncatalog=ckanext.jsoncatalog.plugin:JsoncatalogPlugin
-	[babel.extractors]
-	ckan = ckan.lib.extract:extract_ckan
+    [ckan.plugins]
+    jsoncatalog=ckanext.jsoncatalog.plugin:JsoncatalogPlugin
+    [babel.extractors]
+    ckan = ckan.lib.extract:extract_ckan
     ''',
 
     # If you are changing from the default layout of your extension, you may
