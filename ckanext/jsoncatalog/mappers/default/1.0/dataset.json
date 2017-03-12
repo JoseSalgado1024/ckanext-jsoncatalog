@@ -1,0 +1,19 @@
+{
+  "fields": {
+    "title": "title",
+    "license": "license_title",
+    "identifier": "id",
+    "landingPage": "name",
+    "issued": "metadata_created",
+    "modified": "metadata_modified",
+    "accrualPeriodicity": "extras__accrualPeriodicity",
+    "description": "notes",
+    "themeTaxonimy":"@themeTaxonomy"
+
+  },
+  "required": ["title", "license", "identifier", "issued", "description"],
+  "patterns":{
+    "landingPage": "@site_url/dataset/@value"
+  },
+  "defaults":{}
+}

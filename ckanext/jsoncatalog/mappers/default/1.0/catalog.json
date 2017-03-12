@@ -1,0 +1,27 @@
+
+{
+  "id": {
+    "literal": true,
+    "required": true,
+    "type": "str",
+    "key": "name"
+  },
+  "description": {
+    "literal": true,
+    "required": true,
+    "type": "str",
+    "value": "description"
+  },
+  "label": {
+    "type": "str",
+    "value": "title",
+    "literal": true,
+    "required": true
+  },
+  "fallo": {
+    "literal": true,
+    "required": true,
+    "type": "str",
+    "value": "title"
+  }
+}
