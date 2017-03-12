@@ -1,27 +1,15 @@
 
 {
-  "id": {
-    "literal": true,
-    "required": true,
-    "type": "str",
-    "key": "name"
+  "fields": {
+    "title": "title",
+    "description": "license_title",
+    "superThemeTaxonomy": "",
+    "publisher": "name",
+    "themeTaxonimy":"@themeTaxonomy"
   },
-  "description": {
-    "literal": true,
-    "required": true,
-    "type": "str",
-    "value": "description"
+  "required": ["title", "license", "identifier", "issued", "description"],
+  "patterns":{
+    "superThemeTaxonomy": "@site_url/superThemeTaxonomy.json"
   },
-  "label": {
-    "type": "str",
-    "value": "title",
-    "literal": true,
-    "required": true
-  },
-  "fallo": {
-    "literal": true,
-    "required": true,
-    "type": "str",
-    "value": "title"
-  }
+  "defaults":{}
 }

@@ -8,7 +8,7 @@
     "modified": "metadata_modified",
     "accrualPeriodicity": "extras__accrualPeriodicity",
     "description": "notes",
-    "themeTaxonimy":"@themeTaxonomy"
+    "date_render":"@actual_date"
 
   },
   "required": ["title", "license", "identifier", "issued", "description"],
