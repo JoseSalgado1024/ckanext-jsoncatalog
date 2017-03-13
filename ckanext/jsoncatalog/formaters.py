@@ -13,7 +13,9 @@ class WildCards(object):
     """
     def __init__(self):
 
-        self.site_url = config.get('ckan.site_url')
+        self.site_url = config.get('ckan.site_url', 'http://127.0.0.1:5000')
+        self.site_title = config.get('ckan.site_title', 'No definido')
+        self.site_description = config.get('ckan.site_description', 'No definido')
 
     @property
     def actual_date(self):
