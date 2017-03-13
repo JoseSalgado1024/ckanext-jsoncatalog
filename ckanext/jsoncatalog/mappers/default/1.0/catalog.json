@@ -2,14 +2,17 @@
 {
   "fields": {
     "superThemeTaxonomy": "",
+    "publisher": "",
+    "title": "",
+    "description": "",
     "themeTaxonomy": "@themeTaxonomy",
     "dataset": "@datasets"
-
-
   },
   "required": ["title", "license", "identifier", "issued", "description"],
   "patterns":{
-    "superThemeTaxonomy": "@site_url/superThemeTaxonomy.json"
+    "superThemeTaxonomy": "@site_url/superThemeTaxonomy.json",
+    "title": "@site_title",
+    "description": "@site_description"
   },
   "defaults":{
     "title": "default_title",
