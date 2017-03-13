@@ -79,6 +79,64 @@ class Mappers(object):
                 return False
         return True
 
+    def _available_mappers(self):
+        """
+        Listado de mappers disponobles.
+
+        Args:
+            - None.
+
+        Returns:
+             - List(). listado de mappers disponibles.
+        """
+        return [mapper for mapper in self.__dict__.keys()]
+
+    def apply(self, data=None,  _mapper='catalog'):
+        def map_obj(_obj, mapper_selected):
+            mapped_object = {}
+            for destination, origin in mapper_selected['fields'].items():
+                try:
+                    if destination in mapper_selected['patterns'].keys():
+                        pattern = mapper_selected['patterns'][destination]
+                        pattern = wildcards.apply(_phrase=pattern)
+                        if '@value' in pattern:
+                            pattern = pattern.replace('@value', _obj[origin])
+                        formated = pattern
+                    else:
+                        formated = _obj[origin]
+                    mapped_object[destination] = formated
+
+                except KeyError:
+                    if '@' in origin:
+                        mapped_object[destination] = origin
+                    if destination not in selected_mapper['required']:
+                        pass
+                    else:
+                        raise KeyError
+            return mapped_object
+        """
+        Aplica un mapeo de datos preconfigurado.
+
+        Args:
+            - _mapper:
+
+        Retunrs:
+            - TODO!
+        """
+        if type(data) is None:
+            raise TypeError('El campo \"data\" no admite el tipo: {}'.format(type(data)))
+        if _mapper not in self._available_mappers():
+            raise AttributeError('El mapper \"{}\" no existe.'.format(_mapper))
+        wildcards = WildCards()
+        selected_mapper = self.__dict__[_mapper]
+
+        if type(data) is list:
+            return [map_obj(obj, selected_mapper) for obj in data]
+        elif type(data) is dict:
+            return map_obj(data, selected_mapper)
+        else:
+            raise TypeError('Tipo de dato provisto no valido.')
+
     def __getitem__(self, item):
         if item not in self.__dict__.keys():
             err_msg = 'Mappers(class) no contiene el atributo {}'.format(item)
@@ -123,7 +181,7 @@ class JsonCatalogController(BaseController):
             'message': ''
         }
         try:
-            return self.build_response(self.map_dataset(self.get_datasets()))
+            return self.build_response(self.map_catalog(self.get_catalog()))
         except KeyError:
             return self.build_response(err_response.update({'message': 'Faltan Parametros requerido.'}))
         except ValueError:
@@ -153,6 +211,53 @@ class JsonCatalogController(BaseController):
             err_response['message'] = 'La clave {} no existe dentro de CKAN.'.format(e)
             return self.build_response(err_response)
 
+    def get_catalog(self):
+        """
+        Obtiene informacion del catalogo.
+
+        Retunrs:
+            - TODO.
+        """
+
+        return self.get_ckan_data(_content_of='catalog')
+
+    def map_catalog(self, _catalog):
+        """
+
+        :return:
+        """
+        mapped_catalogs = {}
+        try:
+            mapped_catalogs = self.mappers.apply(_catalog, _mapper='catalog')
+            for k, v in mapped_catalogs.items():
+                if u'@datasets' == unicode(v):
+                    mapped_catalogs.update({k: self.map_dataset(self.get_datasets())})
+                if u'@themeTaxonomy' == unicode(v):
+                    mapped_catalogs.update({k: self.map_themes(self.get_themes())})
+        except (AttributeError, TypeError, KeyError), e:
+            print e
+            # log entry
+            pass
+        return mapped_catalogs
+
+    def get_ckan_data(self, _content_of='catalog'):
+        if _content_of.lower() == 'catalog':
+            datadict = {'sort': 'metadata_modified desc',
+                        'rows': 5000}
+            action = u'package_search'
+            return toolkit.get_action(action)(data_dict=datadict)
+        elif _content_of.lower() == 'datasets':
+            datadict = {'sort': 'metadata_modified desc',
+                        'rows': 5000}
+            action = u'package_search'
+            return toolkit.get_action(action)(data_dict=datadict)['results']
+        elif _content_of.lower() == 'groups':
+            datadict = {'all_fields': True}
+            action = u'group_list'
+            return toolkit.get_action(action)(data_dict=datadict)
+        else:
+            raise AttributeError
+
     def get_datasets(self):
         """
         Obtener lista de datasets contenidos dentro de CKAN.
@@ -161,66 +266,33 @@ class JsonCatalogController(BaseController):
             - List(). Len(list) == n: Lista de los n Dataset existentes en CKAN.
             - List(). Len(list) == 0: si ocurrio un error o no se han cargado datasets.
         """
-        datasets = toolkit.get_action('package_search')(
-            data_dict={
-                'sort': 'metadata_modified desc',
-                'rows': 5000})
-        return datasets['results']
+        return self.get_ckan_data(_content_of='datasets')
 
     def map_dataset(self, _datasets):
         maped_datasets = []
-        for dataset in _datasets:
-            mapped_dataset = {}
-            for destination, origin in self.mappers.dataset['fields'].items():
-                try:
-                    if destination in self.mappers.dataset['patterns'].keys():
-                        pattern = self.mappers.dataset['patterns'][destination]
-                        pattern = self.wildcards.apply(_phrase=pattern)
-                        if '@value' in pattern:
-                            pattern = pattern.replace('@value', dataset[origin])
-                        formated = pattern
-                    else:
-                        formated = dataset[origin]
-                    mapped_dataset[destination] = formated
-
-                except KeyError:
-                    if '@datasets' in origin:
-                        mapped_dataset[destination] = self.map_dataset(self.get_datasets())
-
-                    if '@distributions' in origin:
-                        mapped_dataset[destination] = self.map_themes(self.get_themes())
-
-                    if '@themeTaxonomy' in origin:
-                        mapped_dataset[destination] = self.map_themes(self.get_themes())
-
-                    if destination not in self.mappers.dataset['required']:
-                        pass
-                    else:
-                        raise KeyError
-            if len(mapped_dataset.keys()) > 0:
-                maped_datasets.append(mapped_dataset)
+        try:
+            mapped_datasets = self.mappers.apply(_datasets, _mapper='dataset')
+            for mapped_dataset in mapped_datasets:
+                for k, v in mapped_dataset.items():
+                    if u'@distribution' == unicode(v):
+                        mapped_dataset.update({k: self.map_themes(self.get_themes())})
+        except (AttributeError, TypeError, KeyError), e:
+            print e
+            # log entry
+            pass
         return maped_datasets
 
     def get_themes(self):
-        groups = toolkit.get_action('group_list')(
-            data_dict={'all_fields': True})
-        return groups
+        return self.get_ckan_data(_content_of='groups')
 
     def map_themes(self, _themes):
         mapped_themes = []
-        for theme in _themes:
-            mapped_theme = {}
-            for destination, origin in self.mappers.themeTaxonomy['fields'].items():
-                # TODO: implementar JSONSchema para esta clase de validaciones.
-                if type(origin) in [unicode, str]:
-                    try:
-                        mapped_theme[destination] = theme[origin]
-                    except KeyError:
-                        if destination not in self.mappers.themeTaxonomy['required']:
-                            pass
-                        else:
-                            raise KeyError
-            mapped_themes.append(mapped_theme)
+        try:
+            mapped_themes = self.mappers.apply(_themes, _mapper='themeTaxonomy')
+        except (AttributeError, TypeError, KeyError), e:
+            print e
+            # log entry
+            pass
         return mapped_themes
 
     def build_response(self, _json_data):
