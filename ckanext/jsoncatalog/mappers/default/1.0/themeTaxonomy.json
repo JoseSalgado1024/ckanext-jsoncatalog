@@ -4,9 +4,6 @@
     "description":"description",
     "label": "title"
   },
-  "required":[
-    "id",
-    "description",
-    "label"
-  ]
+  "patterns":{},
+  "required":["id", "description", "label"]
 }

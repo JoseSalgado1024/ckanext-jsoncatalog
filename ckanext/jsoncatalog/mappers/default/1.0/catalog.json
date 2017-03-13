@@ -1,15 +1,21 @@
 
 {
   "fields": {
-    "title": "title",
-    "description": "license_title",
     "superThemeTaxonomy": "",
-    "publisher": "name",
-    "themeTaxonimy":"@themeTaxonomy"
+    "themeTaxonomy": "@themeTaxonomy",
+    "dataset": "@datasets"
+
+
   },
   "required": ["title", "license", "identifier", "issued", "description"],
   "patterns":{
     "superThemeTaxonomy": "@site_url/superThemeTaxonomy.json"
   },
-  "defaults":{}
+  "defaults":{
+    "title": "default_title",
+    "publisher": {
+      "name":"name",
+      "mbox": "user@email.com"
+    }
+  }
 }

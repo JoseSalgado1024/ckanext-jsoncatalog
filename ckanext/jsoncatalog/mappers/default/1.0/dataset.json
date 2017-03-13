@@ -7,9 +7,7 @@
     "issued": "metadata_created",
     "modified": "metadata_modified",
     "accrualPeriodicity": "extras__accrualPeriodicity",
-    "description": "notes",
-    "date_render":"@actual_date"
-
+    "description": "notes"
   },
   "required": ["title", "license", "identifier", "issued", "description"],
   "patterns":{
