@@ -1,10 +1,7 @@
-# coding: utf8
+# -*- coding: utf8 -*-
 
-from os import environ
-import ckan.model as model
 from ckan.config.environment import config
 import arrow
-import dateutil
 
 
 class WildCards(object):
