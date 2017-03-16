@@ -133,7 +133,6 @@ class JsonCatalogController(BaseController):
         except (AttributeError, TypeError, KeyError), e:
             print e
             # log entry
-            pass
         return mapped_datasets
 
     def get_themes(self):
