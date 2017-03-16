@@ -91,7 +91,6 @@ class JsonCatalogController(BaseController):
         except (AttributeError, TypeError, KeyError), e:
             print e
             # log entry
-            pass
         return mapped_catalogs
 
     @staticmethod

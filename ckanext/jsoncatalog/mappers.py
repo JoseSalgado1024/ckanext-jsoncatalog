@@ -87,6 +87,16 @@ class Mappers(object):
         return [mapper for mapper in self.__dict__.keys()]
 
     def apply(self, data=None,  _mapper='catalog'):
+        """
+        Aplica un mapeo de datos preconfigurado.
+
+        Args:
+            - _mapper:
+
+        Retunrs:
+            - TODO!
+        """
+
         def map_obj(_obj, mapper_selected):
             mapped_object = {}
             for destination, origin in mapper_selected['fields'].items():
@@ -109,15 +119,7 @@ class Mappers(object):
                     else:
                         raise KeyError
             return mapped_object
-        """
-        Aplica un mapeo de datos preconfigurado.
 
-        Args:
-            - _mapper:
-
-        Retunrs:
-            - TODO!
-        """
         if data in [None]:
             raise TypeError('El campo \"data\" no admite el tipo: {}'.format(type(data)))
         if _mapper not in self._available_mappers():
