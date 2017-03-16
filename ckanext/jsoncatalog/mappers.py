@@ -127,9 +127,9 @@ class Mappers(object):
         wildcards = WildCards()
         selected_mapper = self.__dict__[_mapper]
 
-        if type(data) is list:
+        if isinstance(data, list):
             return [map_obj(obj, selected_mapper) for obj in data]
-        elif type(data) is dict:
+        elif isinstance(data, dict):
             return map_obj(data, selected_mapper)
         else:
             raise TypeError('Tipo de dato provisto no valido.')

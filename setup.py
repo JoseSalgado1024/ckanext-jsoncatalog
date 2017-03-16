@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from setuptools import setup, find_packages  # Always prefer setuptools over distutils
-from codecs import open  # To use a consistent encoding
+from setuptools import setup, find_packages
+from codecs import open
 from os import path
 
 here = path.abspath(path.dirname(__file__))
@@ -20,7 +20,7 @@ setup(
     # http://packaging.python.org/en/latest/tutorial.html#version
     version='0.0.1',
 
-    description='''"Publicación de catalogo en formato data.json"''',
+    description='''"Publicación de catalogo en formato .json"''',
     long_description=long_description,
 
     # The project's main homepage.
