@@ -1,21 +1,14 @@
-# coding: utf8
+# -*- coding: utf8 -*-
 """
 
 """
-import ckan.plugins as plugins
-import ckan.plugins.toolkit as toolkit
-from pylons import response
-from ckan.lib.base import BaseController
-import json
-import logging
-from os import path
 from controller import *
 logger = logging.getLogger('jsoncatalog')
 
 
 class JsoncatalogPlugin(plugins.SingletonPlugin):
     """
-
+    Implementación del plugin JSON Catalog plugin
     """
     plugins.implements(plugins.interfaces.IConfigurer)
     plugins.implements(plugins.interfaces.IRoutes, inherit=True)
@@ -38,13 +31,6 @@ class JsoncatalogPlugin(plugins.SingletonPlugin):
 
     def before_map(self, m):
         return m
-
-    def load_mapper(self):
-        """
-
-        :return:
-        """
-        pass
 
     def after_map(self, m):
         if JsoncatalogPlugin.plugin_is_enable:
