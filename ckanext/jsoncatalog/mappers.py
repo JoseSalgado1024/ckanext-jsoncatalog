@@ -44,6 +44,7 @@ class Mappers(object):
              - None: Fallo la carga de Mappers.
         """
         result = False
+        err_list = []
         wrk_folder = path.dirname(__file__)
         mappers_folder = path.join('mappers', '{schema}/{version}'.format(schema=schema,
                                                                           version=version))
@@ -62,11 +63,13 @@ class Mappers(object):
                 self.__dict__[mapper] = json.load(open(mfs))
                 result = True
             except IOError:
-                logger.critical('Fallo la carga del mapper: {}.'.format(mapper))
+                err_list.append('Fallo la carga del mapper: {}.'.format(mapper))
             except ValueError:
-                logger.critical('No es posible decodificar el mapper {}, no es JSON valido'.format(mapper))
-            finally:
-                return result
+                err_list.append('No es posible decodificar el mapper {}, no es JSON valido'.format(mapper))
+
+            if len(err_list) > 0:
+                logger.critical('\n'.join(err_list))
+            return result
 
     def _available_mappers(self):
         """

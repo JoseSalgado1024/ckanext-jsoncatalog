@@ -3,6 +3,8 @@ import ckan.plugins.toolkit as toolkit
 from pylons import response
 from ckan.lib.base import BaseController
 from mappers import *
+
+
 logger = logging.getLogger('jsoncatalog.controller')
 
 
@@ -51,7 +53,7 @@ class JsonCatalogController(BaseController):
         Returns:
             - JSON response. ThemeTaxonomy en formato json.
         """
-        err_response = {
+        _response = {
             'status': 404,
             'message': ''
         }
@@ -60,15 +62,13 @@ class JsonCatalogController(BaseController):
             thm_txnm = self.map_themes(self.get_themes())
             return self.build_response(thm_txnm)
         except KeyError as e:
-            err_response['message'] = 'Falta parametro {} requerido.'.format(e)
+            _response['message'] = 'Falta parametro {} requerido.'.format(e)
         except ValueError, e:
-            err_response['message'] = 'La clave {} no existe dentro de CKAN.'.format(e)
+            _response['message'] = 'La clave {} no existe dentro de CKAN.'.format(e)
         finally:
-            if len(err_response['message']) > 0:
-                r = err_response
-            else:
-                r = thm_txnm
-            return self.build_response(r)
+            if len(_response['message']) < 0:
+                _response = thm_txnm
+        return self.build_response(_response)
 
     def get_catalog(self):
         """
@@ -93,9 +93,8 @@ class JsonCatalogController(BaseController):
                     mapped_catalogs.update({k: self.map_dataset(self.get_datasets())})
                 if u'@themeTaxonomy' == unicode(v):
                     mapped_catalogs.update({k: self.map_themes(self.get_themes())})
-        except (AttributeError, TypeError, KeyError), e:
-            print e
-            # log entry
+        except (AttributeError, TypeError, KeyError) as e:
+            logger.error('>> {}'.format(e))
         return mapped_catalogs
 
     @staticmethod
@@ -135,9 +134,8 @@ class JsonCatalogController(BaseController):
                 for k, v in mapped_dataset.items():
                     if u'@distribution' == unicode(v):
                         mapped_dataset.update({k: self.map_themes(self.get_themes())})
-        except (AttributeError, TypeError, KeyError), e:
-            print e
-            # log entry
+        except (AttributeError, TypeError, KeyError) as e:
+            logger.error('++ {}'.format(e))
         return mapped_datasets
 
     def get_themes(self):
@@ -147,9 +145,9 @@ class JsonCatalogController(BaseController):
         mapped_themes = []
         try:
             mapped_themes = self.mappers.apply(_themes, _mapper='themeTaxonomy')
-        except (AttributeError, TypeError, KeyError), e:
-            print e
-            # log entry
+        except (AttributeError, TypeError, KeyError) as e:
+            logger.error('-- {}'.format(e))
+
         return mapped_themes
 
     @staticmethod
