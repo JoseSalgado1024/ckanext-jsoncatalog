@@ -51,9 +51,7 @@ class Mappers(object):
 
         # Chequeo que exista el schema seleccionado.
         if not path.exists(abs_path_mappers):
-            err_msg = 'No es posible localizar el schema:{}, vesion:{}.'.format(schema, version)
-            logger.critical(err_msg)
-            raise IOError(err_msg)
+              raise IOError
 
         # Chequeo que existan todas la partes requeridas del schema.
         # dataset, distribution, catalog y themeTaxonomy
@@ -63,14 +61,11 @@ class Mappers(object):
                 self.__dict__[mapper] = json.load(open(mfs))
             except IOError:
                 err_msg = 'Fallo la carga del mapper: {}.'.format(mapper)
-                logger.critical(err_msg)
-                _errs.append(err_msg)
-                return False
             except ValueError:
-                err_msg = ('No es posible decodificar el mapper {},'
-                           'no parece ser un JSON valido'.format(mapper))
-                logger.critical(err_msg)
+                err_msg = ('No es posible decodificar el mapper {}, no es JSON valido'.format(mapper))
+            finally:
                 _errs.append(err_msg)
+                logger.critical(err_msg)
                 return False
         return True
 
