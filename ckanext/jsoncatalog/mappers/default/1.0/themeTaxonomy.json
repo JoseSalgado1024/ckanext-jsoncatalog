@@ -1,0 +1,9 @@
+{
+  "fields": {
+    "id":"name",
+    "description":"description",
+    "label": "title"
+  },
+  "patterns":{},
+  "required":["id", "description", "label"]
+}

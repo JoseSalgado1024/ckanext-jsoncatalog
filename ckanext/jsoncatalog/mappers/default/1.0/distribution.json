@@ -1,0 +1,14 @@
+{
+  "fields":{
+    "title": "",
+    "description": "",
+    "issued": "",
+    "format": "",
+    "modified": "",
+    "license": "",
+    "accessURL": "",
+    "downloadURL": ""
+  },
+  "required":[],
+  "patterns":{}
+}
