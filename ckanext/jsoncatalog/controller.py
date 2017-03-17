@@ -61,12 +61,10 @@ class JsonCatalogController(BaseController):
             return self.build_response(thm_txnm)
         except KeyError as e:
             err_response['message'] = 'Falta parametro {} requerido.'.format(e)
-            err = True
         except ValueError, e:
             err_response['message'] = 'La clave {} no existe dentro de CKAN.'.format(e)
-            err = True
         finally:
-            if err:
+            if len(err_response['message']) > 0:
                 r = err_response
             else:
                 r = thm_txnm
