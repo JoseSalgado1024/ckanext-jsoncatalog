@@ -55,15 +55,22 @@ class JsonCatalogController(BaseController):
             'status': 404,
             'message': ''
         }
+        thm_txnm = []
         try:
             thm_txnm = self.map_themes(self.get_themes())
             return self.build_response(thm_txnm)
-        except KeyError, e:
+        except KeyError as e:
             err_response['message'] = 'Falta parametro {} requerido.'.format(e)
-            return self.build_response(err_response)
+            err = True
         except ValueError, e:
             err_response['message'] = 'La clave {} no existe dentro de CKAN.'.format(e)
-            return self.build_response(err_response)
+            err = True
+        finally:
+            if err:
+                r = err_response
+            else:
+                r = thm_txnm
+            return self.build_response(r)
 
     def get_catalog(self):
         """
