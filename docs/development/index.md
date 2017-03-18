@@ -1,7 +1,7 @@
 Desarrollo
 ---
 
-* [Requirimientos:](development/install/requirimientos.md)
-* [Instalacion:](development/install/instalacion.md)
-* [Uso:](development/usage/configurar.md)
-* [Test:](development/test/testing.md)
+* [Requirimientos:](install/requirimientos.md)
+* [Instalacion:](install/instalacion.md)
+* [Uso:](usage/configurar.md)
+* [Test:](test/testing.md)
