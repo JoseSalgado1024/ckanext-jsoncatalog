@@ -4,17 +4,12 @@
 Tests for the ckanext.jsoncatalog extension.
 
 """
-import webtest
-
 from nose.tools import assert_raises
 from nose.tools import assert_equal
-
 import ckan.model as model
-import ckan.tests.legacy as tests
 import ckan.plugins
 import ckan.tests.factories as factories
 import ckan.logic as logic
-from ckan.config.environment import config
 
 
 class TestPluginParentJsoncatalog(object):

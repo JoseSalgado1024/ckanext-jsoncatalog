@@ -139,6 +139,13 @@ class JsonCatalogController(BaseController):
         return mapped_datasets
 
     def get_themes(self):
+        """
+        Obtener lista de grupos contenidos dentro de CKAN.
+
+        Returns:
+          - List(). Len(list) == n: Lista de los n grupos existentes en CKAN.
+          - List(). Len(list) == 0: si ocurrio un error o no se han cargado grupos.
+        """
         return self.get_ckan_data(_content_of='groups')
 
     def map_themes(self, _themes):

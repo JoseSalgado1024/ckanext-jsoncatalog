@@ -24,8 +24,8 @@ class JsoncatalogPlugin(plugins.SingletonPlugin):
         """
         JsoncatalogPlugin.plugin_is_enable = config_.get("ckanext.json_catalog.is_active", "True") == 'True'
         JsoncatalogPlugin.catalog_url = config_.get("ckanext.json_catalog.uri", "/catalog.json")
-        JsoncatalogPlugin.mapper = config_.get("ckanext.json_catalog.mapper_version", "default")
-        JsoncatalogPlugin.version = config_.get("ckanext.json_catalog.mapper_version", "1.0")
+        JsoncatalogPlugin.mapper = config_.get("ckanext.json_catalog.schema", "default")
+        JsoncatalogPlugin.version = config_.get("ckanext.json_catalog.version", "1.0")
         JsoncatalogPlugin.theme_taxonomy_url = config_.get("ckanext.json_catalog.uri", "/themeTaxonomy.json")
         plugin_folder = path.dirname(__file__)
         JsoncatalogPlugin.mappers_folder = path.join(plugin_folder, 'mappers')
