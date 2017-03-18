@@ -15,11 +15,11 @@ Indice:
 
 <!-- MarkdownTOC -->
 
-- [Requirimientos:](#requirimientos)
-- [Instalacion:](#instalacion)
-- [Configurar:](#configurar)
-- [Development Installation](#development-installation)
-- [Running the Tests](#running-the-tests)
+* [Requirimientos:](#requirimientos)
+* [Instalacion:](#instalacion)
+* [Configurar:](#configurar)
+* [Development Installation](#development-installation)
+* [Running the Tests](#running-the-tests)
 
 <!-- /MarkdownTOC -->
 
