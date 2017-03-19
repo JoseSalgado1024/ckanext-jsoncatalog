@@ -7,9 +7,7 @@
 [![Issue Count](https://codeclimate.com/github/JoseSalgado1024/ckanext-jsoncatalog/badges/issue_count.svg)](https://codeclimate.com/github/JoseSalgado1024/ckanext-jsoncatalog)
 [![Docs Status](https://readthedocs.org/projects/ckanext-jsoncatalog/badge/?version=development)](http://ckanext-jsoncatalog.readthedocs.io/es/development/)
 
+ckanext-jsoncatalog
 ---
 
 Documentacion del proyecto en [ReadTheDocs](http://ckanext-jsoncatalog.readthedocs.io/es/latest/)
-=======
-JSON Catalog
---- 
