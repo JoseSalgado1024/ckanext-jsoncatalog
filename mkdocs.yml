@@ -4,3 +4,6 @@ pages:
     - Home: index.md
     - Desarrollo: development.md
     - Produccion: production.md
+
+theme: readthedocs
+repo_url: https://github.com/JoseSalgado1024/ckanext-jsoncatalog
