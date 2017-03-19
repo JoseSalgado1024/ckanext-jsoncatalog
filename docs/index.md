@@ -7,7 +7,13 @@
 [![Issue Count](https://codeclimate.com/github/JoseSalgado1024/ckanext-jsoncatalog/badges/issue_count.svg)](https://codeclimate.com/github/JoseSalgado1024/ckanext-jsoncatalog)
 [![Docs Status](https://readthedocs.org/projects/ckanext-jsoncatalog/badge/?version=development)](http://ckanext-jsoncatalog.readthedocs.io/es/development/)
 
+
+
 # ckanext-jsoncatalog
+
+_La presente documentacion se encuntra en ``desarrollo``, al igual que el resto del proyecto, por tanto, sepan disculpar los errores que pueda contener_
+
+_Asi mismo, cualquier fallo o duda que encuentres, no dudes en [crear un issue](https://github.com/JoseSalgado1024/ckanext-jsoncatalog/issues/new?title=Bug en jsoncatalog)_
 
 Extension para la publicacion de catalogos de datos en formato `JSON`.
 

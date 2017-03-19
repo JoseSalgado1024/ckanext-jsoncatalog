@@ -10,4 +10,6 @@
 ckanext-jsoncatalog
 ---
 
+Extension de [CKAN](https://docs.ckan.org/en/latest/) creada para la publicacion de Catalogos de Datos en formato `data.json`
+
 Documentacion del proyecto en [ReadTheDocs](http://ckanext-jsoncatalog.readthedocs.io/es/latest/)
