@@ -10,5 +10,6 @@
     "downloadURL": ""
   },
   "required":[],
-  "patterns":{}
+  "patterns":{},
+  "defaults":{}
 }
