@@ -43,7 +43,8 @@ class Mappers(object):
              - Mappers: Clase contenedora de mapeos.
              - None: Fallo la carga de Mappers.
         """
-        _errs = []
+        result = False
+        err_list = []
         wrk_folder = path.dirname(__file__)
         mappers_folder = path.join('mappers', '{schema}/{version}'.format(schema=schema,
                                                                           version=version))
@@ -51,28 +52,24 @@ class Mappers(object):
 
         # Chequeo que exista el schema seleccionado.
         if not path.exists(abs_path_mappers):
-            err_msg = 'No es posible localizar el schema:{}, vesion:{}.'.format(schema, version)
-            logger.critical(err_msg)
-            raise IOError(err_msg)
+              raise IOError
 
         # Chequeo que existan todas la partes requeridas del schema.
         # dataset, distribution, catalog y themeTaxonomy
+
         for mapper in self.__dict__.keys():
             mfs = path.join(abs_path_mappers, '{}.json'.format(mapper))
             try:
                 self.__dict__[mapper] = json.load(open(mfs))
+                result = True
             except IOError:
-                err_msg = 'Fallo la carga del mapper: {}.'.format(mapper)
-                logger.critical(err_msg)
-                _errs.append(err_msg)
-                return False
+                err_list.append('Fallo la carga del mapper: {}.'.format(mapper))
             except ValueError:
-                err_msg = ('No es posible decodificar el mapper {},'
-                           'no parece ser un JSON valido'.format(mapper))
-                logger.critical(err_msg)
-                _errs.append(err_msg)
-                return False
-        return True
+                err_list.append('No es posible decodificar el mapper {}, no es JSON valido'.format(mapper))
+
+            if len(err_list) > 0:
+                logger.critical('\n'.join(err_list))
+            return result
 
     def _available_mappers(self):
         """

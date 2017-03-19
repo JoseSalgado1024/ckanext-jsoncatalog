@@ -1,0 +1,6 @@
+site_name: ckanext-jsoncatalog
+
+pages:
+    - Home: index.md
+    - Desarrollo: development.md
+    - Produccion: production.md
