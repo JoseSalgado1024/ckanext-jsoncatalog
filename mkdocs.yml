@@ -4,5 +4,3 @@ pages:
     - Home: index.md
     - Desarrollo: development.md
     - Produccion: production.md
-
-theme: readthedocs

@@ -5,6 +5,7 @@
 [![Coverage Status](https://img.shields.io/github/license/mashape/apistatus.svg)](https://img.shields.io/github/license/mashape/apistatus.svg)
 [![Code Climate](https://codeclimate.com/github/JoseSalgado1024/ckanext-jsoncatalog/badges/gpa.svg)](https://codeclimate.com/github/JoseSalgado1024/ckanext-jsoncatalog)
 [![Issue Count](https://codeclimate.com/github/JoseSalgado1024/ckanext-jsoncatalog/badges/issue_count.svg)](https://codeclimate.com/github/JoseSalgado1024/ckanext-jsoncatalog)
+[![Docs Status](https://readthedocs.org/projects/ckanext-jsoncatalog/badge/?version=development)](http://ckanext-jsoncatalog.readthedocs.io/es/development/)
 
 # ckanext-jsoncatalog
 
