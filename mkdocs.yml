@@ -1,10 +1,8 @@
 site_name: ckanext-jsoncatalog
+
 pages:
-  - Home: 'index.md'
-  - Desarrollo:
-    - 'Requerimientos': 'development/docker_ansible.md'
-    - 'Instalacion': 'development/docker_ansible.md'
-    - 'Uso': 'development/docker_ansible.md'
-    - 'Testing': 'development/docker_ansible.md'
-  - Uso:
-    - Docker: 'usage/docker.md'
+    - Home: index.md
+    - Desarrollo: development.md
+    - Produccion: production.md
+
+theme: readthedocs
