@@ -2,6 +2,7 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from pylons import response
 from ckan.lib.base import BaseController
+from ckan.config.environment import config as ckan_config
 from mappers import *
 
 
@@ -15,7 +16,13 @@ class JsonCatalogController(BaseController):
     _errors_json = []
 
     def __init__(self):
-        self.mappers = Mappers()
+        plugin_folder = path.dirname(__file__)
+        self.mappers_folder = path.join(plugin_folder, 'mappers')
+
+        mapper = ckan_config.get('ckanext.json_catalog.schema', 'default')
+        mapper_version = ckan_config.get('ckanext.json_catalog.version', '1.0')
+
+        self.mappers = Mappers(schema=mapper, version=mapper_version)
         self.wildcards = WildCards()
 
     def generate_catalog(self):
@@ -39,9 +46,10 @@ class JsonCatalogController(BaseController):
         try:
             return self.build_response(self.map_catalog(self.get_catalog()))
         except KeyError:
-            return self.build_response(err_response.update({'message': 'Faltan Parametros requerido.'}))
+            err_response.update({'message': 'Faltan Parametros requerido.'})
         except ValueError:
-            return self.build_response(err_response.update({'message': 'Formato no esperado.'}))
+            err_response.update({'message': 'Formato no esperado.'})
+        return self.build_response(err_response)
 
     def generate_theme_taxonomy(self):
         """
@@ -75,7 +83,7 @@ class JsonCatalogController(BaseController):
         Obtiene informacion del catalogo.
 
         Retunrs:
-            - TODO.
+            - Dict.
         """
 
         return self.get_ckan_data(_content_of='catalog')

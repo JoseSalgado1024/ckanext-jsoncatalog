@@ -3,6 +3,8 @@ import logging
 import json
 from os import path
 from formaters import *
+from jsonschema.exceptions import *
+import jsonschema
 logger = logging.getLogger(__name__)
 
 
@@ -18,6 +20,37 @@ class Mappers(object):
         self.themeTaxonomy = ''
         if not self._load(schema, version):
             raise IOError('Imposble cargar mappers.')
+
+    def validate_mapper(self, mapper_path):
+        """
+        Validacion de mappers.
+
+        Returns:
+            - Bool:
+                - True: Es un mapper valido.
+                - False: No es un mapper valido.
+        """
+        try:
+            sv_path = path.join(path.dirname(__file__), 'validators/schema.validator.json')
+            _valid_schema = json.load(open(sv_path))
+            _mapper, _format = path.basename(mapper_path).split('.')
+            if _mapper not in self.__dict__.keys():
+                raise KeyError
+            if _format.lower() not in ['json']:
+                raise TypeError
+            if not path.exists(mapper_path):
+                raise IOError
+            _loaded_mapper = json.load(open(mapper_path))
+            jsonschema.validate(_loaded_mapper, _valid_schema)
+            return True
+        except (IOError, KeyError), e:
+            print e
+            return False
+        except ValidationError, e:
+            print e
+            return False
+        except Exception, e:
+            print e
 
     def _load(self, schema, version):
         """
@@ -44,7 +77,6 @@ class Mappers(object):
              - None: Fallo la carga de Mappers.
         """
         result = False
-        err_list = []
         wrk_folder = path.dirname(__file__)
         mappers_folder = path.join('mappers', '{schema}/{version}'.format(schema=schema,
                                                                           version=version))
@@ -56,20 +88,18 @@ class Mappers(object):
 
         # Chequeo que existan todas la partes requeridas del schema.
         # dataset, distribution, catalog y themeTaxonomy
-
         for mapper in self.__dict__.keys():
             mfs = path.join(abs_path_mappers, '{}.json'.format(mapper))
             try:
-                self.__dict__[mapper] = json.load(open(mfs))
-                result = True
+                result = self.validate_mapper(mfs)
+                if result:
+                    self.__dict__[mapper] = json.load(open(mfs))
             except IOError:
-                err_list.append('Fallo la carga del mapper: {}.'.format(mapper))
+                logger.critical('Fallo la carga del mapper: {}.'.format(mapper))
             except ValueError:
-                err_list.append('No es posible decodificar el mapper {}, no es JSON valido'.format(mapper))
-
-            if len(err_list) > 0:
-                logger.critical('\n'.join(err_list))
-            return result
+                logger.critical('No es posible decodificar el mapper {}, no es JSON valido'.format(mapper))
+            finally:
+                return result
 
     def _available_mappers(self):
         """
