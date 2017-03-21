@@ -5,6 +5,7 @@ from os import path
 from formaters import *
 from jsonschema.exceptions import *
 import jsonschema
+
 logger = logging.getLogger(__name__)
 
 
@@ -43,14 +44,10 @@ class Mappers(object):
             _loaded_mapper = json.load(open(mapper_path))
             jsonschema.validate(_loaded_mapper, _valid_schema)
             return True
-        except (IOError, KeyError), e:
-            print e
+        except (IOError, KeyError):
             return False
-        except ValidationError, e:
-            print e
+        except ValidationError:
             return False
-        except Exception, e:
-            print e
 
     def _load(self, schema, version):
         """
@@ -84,10 +81,11 @@ class Mappers(object):
 
         # Chequeo que exista el schema seleccionado.
         if not path.exists(abs_path_mappers):
-              raise IOError
+            raise IOError
 
         # Chequeo que existan todas la partes requeridas del schema.
         # dataset, distribution, catalog y themeTaxonomy
+        load_results = []
         for mapper in self.__dict__.keys():
             mfs = path.join(abs_path_mappers, '{}.json'.format(mapper))
             try:
@@ -98,8 +96,8 @@ class Mappers(object):
                 logger.critical('Fallo la carga del mapper: {}.'.format(mapper))
             except ValueError:
                 logger.critical('No es posible decodificar el mapper {}, no es JSON valido'.format(mapper))
-            finally:
-                return result
+            load_results.append(result)
+        return False not in load_results
 
     def _available_mappers(self):
         """
@@ -113,14 +111,14 @@ class Mappers(object):
         """
         return [mapper for mapper in self.__dict__.keys()]
 
-    def apply(self, data=None,  _mapper='catalog'):
+    def apply(self, data=None, _mapper='catalog'):
         """
-        Aplica un mapeo de datos preconfigurado.
+        Aplica un mapeo de datos pre-configurado.
 
         Args:
             - _mapper:
 
-        Retunrs:
+        Returns:
             - TODO!
         """
 
@@ -144,7 +142,7 @@ class Mappers(object):
                     if destination not in selected_mapper['required']:
                         pass
                     else:
-                        raise KeyError
+                        pass
             return mapped_object
 
         if data in [None]:
@@ -155,7 +153,10 @@ class Mappers(object):
         selected_mapper = self.__dict__[_mapper]
 
         if isinstance(data, list):
-            return [map_obj(obj, selected_mapper) for obj in data]
+            list_of_item = []
+            for o in data:
+                list_of_item.append(map_obj(o, selected_mapper))
+            return list_of_item
         elif isinstance(data, dict):
             return map_obj(data, selected_mapper)
         else:
@@ -174,4 +175,3 @@ class Mappers(object):
 
     def __setattr__(self, key, value):
         self.__dict__[key] = value
-

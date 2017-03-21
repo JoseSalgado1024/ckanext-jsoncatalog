@@ -91,11 +91,15 @@ class JsonCatalogController(BaseController):
     def map_catalog(self, _catalog):
         """
 
-        :return:
+        Returns:
+            Dict():
+                - {}(vacio), ante Fallo.
+                - {catalogo}, Exito.
+
         """
         mapped_catalogs = {}
         try:
-            mapped_catalogs = self.mappers.apply(_catalog, _mapper='catalog')
+            mapped_catalogs = self.mappers.apply(data=_catalog, _mapper='catalog')
             for k, v in mapped_catalogs.items():
                 if u'@datasets' == unicode(v):
                     mapped_catalogs.update({k: self.map_dataset(self.get_datasets())})
@@ -106,14 +110,21 @@ class JsonCatalogController(BaseController):
         return mapped_catalogs
 
     @staticmethod
-    def get_ckan_data(_content_of='catalog'):
+    def get_ckan_data(_content_of='catalog', id=None):
+
         if _content_of.lower() == 'catalog':
             datadict = {'sort': 'metadata_modified desc',
                         'rows': 5000}
             action = u'package_search'
             return toolkit.get_action(action)(data_dict=datadict)
+        elif _content_of.lower() == 'distributions':
+            datadict = {'sort': 'metadata_modified desc',
+                        'rows': 5000}
+            action = u'package_search'
+            return toolkit.get_action(action)(data_dict=datadict)['results']
         elif _content_of.lower() == 'datasets':
             datadict = {'sort': 'metadata_modified desc',
+                        'id': '',
                         'rows': 5000}
             action = u'package_search'
             return toolkit.get_action(action)(data_dict=datadict)['results']
@@ -140,21 +151,70 @@ class JsonCatalogController(BaseController):
             mapped_datasets = self.mappers.apply(_datasets, _mapper='dataset')
             for mapped_dataset in mapped_datasets:
                 for k, v in mapped_dataset.items():
-                    if u'@distribution' == unicode(v):
-                        mapped_dataset.update({k: self.map_themes(self.get_themes())})
-        except (AttributeError, TypeError, KeyError) as e:
+                    if u'@distributions' == unicode(v):
+                        mapped_dataset.update({k: self.map_distribution(self.get_themes())})
+        except (AttributeError, TypeError, KeyError),  e:
             logger.error('++ {}'.format(e))
         return mapped_datasets
 
-    def get_themes(self):
+    def exists(self, _obj='dataset', _key=None, _value=None):
         """
-        Obtener lista de grupos contenidos dentro de CKAN.
+        Busqueda dentro de la data de ckan.
+
+        Args:
+            - _obj:
+            - key_to_search:
 
         Returns:
-          - List(). Len(list) == n: Lista de los n grupos existentes en CKAN.
-          - List(). Len(list) == 0: si ocurrio un error o no se han cargado grupos.
+             - bool():
+                - True, Existe dentro de _obj la clave:_key y posee el valor: _value.
+                - False: No existe dentro de _obj la clave:_key o no posee el valor: _value.
         """
-        return self.get_ckan_data(_content_of='groups')
+        def search_in_dict(d, _k, _v):
+            r = False
+            try:
+                if d[_k] == _v:
+                    r = True
+            except IndexError:
+                pass
+            return r
+
+        # si _key o _value es None, retorno false.
+        results = False
+        if None in [_key, _value]:
+            return results
+        data = self.get_ckan_data(_obj)
+        if isinstance(data, list):
+            for elem in data:
+                results = search_in_dict(elem, _key, _value)
+                if results:
+                    break
+        elif isinstance(data, dict):
+            results = search_in_dict(data, _key, _value)
+        else:
+            return results
+        return results
+
+    def map_distribution(self, _dataset):
+        mapped_distributions = []
+        try:
+            mapped_distributions = self.mappers.apply(_dataset, _mapper='distributions')
+        except (AttributeError, TypeError, KeyError), e:
+            logger.error('[mapper.distributions] {}'.format(e))
+        return mapped_distributions
+
+    def get_dataset(self, dataset_id=None):
+        """
+        Obtener diccionario con el contenido del dataset.
+
+        Returns:
+          - dict(). Len(dict) == n: Lista de los n grupos existentes en CKAN.
+          - dict(). Len(dict) == 0: si ocurrio un error o no se han cargado dataset.
+        """
+        _dataset = {}
+        if dataset_id in [None]:
+            return _dataset
+        return self.get_ckan_data(_content_of='distributions')
 
     def map_themes(self, _themes):
         mapped_themes = []
