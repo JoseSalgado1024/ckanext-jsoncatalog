@@ -120,6 +120,15 @@ def test_wildcards_set_and_apply():
         wildcards.__dict__[wildcard] = wildcard
     assert_equals(wildcards.apply('@site_url') == 'site_url', True)
 
+
+def test_wildcards_list():
+    """
+    Test 7: Aplicar una wildcard a una frase retorna una cadena.
+
+    """
+    wildcards = WildCards()
+    assert_equals(sorted(wildcards.list()), sorted(['site_url', 'site_description', 'site_title']))
+
 """
 
  Tests para clase Controller.
