@@ -4,6 +4,8 @@ from ckanext.jsoncatalog.mappers import Mappers
 from ckanext.jsoncatalog.formaters import WildCards
 from ckan.config.environment import config
 from ckanext.jsoncatalog.controller import JsonCatalogController
+from ckan.tests import factories
+from nose.tools import *
 
 """
 
@@ -18,7 +20,7 @@ def test_load_mappers():
 
     """
     mappers = Mappers()
-    assert mappers.load(schema='default', version='1.0'), True
+    assert_equal(mappers.load(schema='default', version='1.0'), True)
 
 
 def test_mappers_class_load_not_exists_schema():
@@ -57,6 +59,7 @@ def test_mappers_class_init_cls_load_not_exists_version():
         pass
 
 
+@raises(IOError)
 def test_mappers_class_int_cls_load_not_exists_schema():
     """
     Test 5: No existe schema provisto para carga de mappers
@@ -64,10 +67,7 @@ def test_mappers_class_int_cls_load_not_exists_schema():
 
     """
     mappers = Mappers()
-    try:
-        mappers.load(schema='no_existe', version='1.0')
-    except IOError:
-        pass
+    mappers.load(schema='no_existe', version='1.0')
 
 
 """
@@ -105,7 +105,9 @@ def test_wildcards_apply():
     test_this = []
     for windc_name, windc_value in wildcards.__dict__.items():
         test_this.append({windc_name: windc_value})
-    assert test_this, right_answers
+    print test_this
+    print right_answers
+    assert_equal(len(test_this), len(right_answers))
 
 
 def test_wildcards_set_and_apply():
@@ -116,38 +118,10 @@ def test_wildcards_set_and_apply():
     wildcards = WildCards()
     for wildcard in wildcards.__dict__.keys():
         wildcards.__dict__[wildcard] = wildcard
-    assert wildcards.apply('@site_url') == 'site_url', True
+    assert_equals(wildcards.apply('@site_url') == 'site_url', True)
 
 """
 
  Tests para clase Controller.
 
 """
-
-
-def test_controller_get_datasets_type():
-    """
-    Test 10: Instancia del controller.
-
-    """
-    controller = JsonCatalogController()
-    assert controller.get_datasets(), list
-
-
-def test_controller_generate_theme_taxonomy_type():
-    """
-    Test 11: Instancia del controller.
-
-    """
-    controller = JsonCatalogController()
-    print type(controller.map_themes(controller.get_themes()))
-    assert isinstance(controller.map_themes(controller.get_themes()), list), True
-
-
-def test_controller_get_ckan_data_type():
-    """
-    Test 12: Instancia del controller.
-
-    """
-    controller = JsonCatalogController()
-    assert controller.get_ckan_data(), dict
