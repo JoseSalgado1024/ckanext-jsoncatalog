@@ -2,7 +2,7 @@
 """
 
 """
-from controller import *
+from ckanext.jsoncatalog.controller import *
 logger = logging.getLogger('jsoncatalog')
 
 
@@ -12,7 +12,6 @@ class JsoncatalogPlugin(plugins.SingletonPlugin):
     """
     plugins.implements(plugins.interfaces.IConfigurer)
     plugins.implements(plugins.interfaces.IRoutes, inherit=True)
-
 
     def update_config(self, config_):
         """
