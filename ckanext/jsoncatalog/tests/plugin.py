@@ -1,1 +1,0 @@
-ckanext/jsoncatalog/plugin.py

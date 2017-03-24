@@ -19,7 +19,7 @@ class Mappers(object):
         self.dataset = ''
         self.distribution = ''
         self.themeTaxonomy = ''
-        if not self._load(schema, version):
+        if not self.load(schema, version):
             raise IOError('Imposble cargar mappers.')
 
     def validate_mapper(self, mapper_path):
@@ -49,7 +49,7 @@ class Mappers(object):
         except ValidationError:
             return False
 
-    def _load(self, schema, version):
+    def load(self, schema, version):
         """
         Carga las diferentes reglas de mapeos.
 
@@ -99,7 +99,7 @@ class Mappers(object):
             load_results.append(result)
         return False not in load_results
 
-    def _available_mappers(self):
+    def available_mappers(self):
         """
         Listado de mappers disponobles.
 
@@ -147,7 +147,7 @@ class Mappers(object):
 
         if data in [None]:
             raise TypeError('El campo \"data\" no admite el tipo: {}'.format(type(data)))
-        if _mapper not in self._available_mappers():
+        if _mapper not in self.available_mappers():
             raise AttributeError('El mapper \"{}\" no existe.'.format(_mapper))
         wildcards = WildCards()
         selected_mapper = self.__dict__[_mapper]

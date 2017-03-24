@@ -71,7 +71,7 @@ class JsonCatalogController(BaseController):
             return self.build_response(thm_txnm)
         except KeyError as e:
             _response['message'] = 'Falta parametro {} requerido.'.format(e)
-        except ValueError, e:
+        except ValueError as e:
             _response['message'] = 'La clave {} no existe dentro de CKAN.'.format(e)
         finally:
             if len(_response['message']) < 0:
@@ -110,7 +110,7 @@ class JsonCatalogController(BaseController):
         return mapped_catalogs
 
     @staticmethod
-    def get_ckan_data(_content_of='catalog', id=None):
+    def get_ckan_data(_content_of='catalog', dataset_id=None):
 
         if _content_of.lower() == 'catalog':
             datadict = {'sort': 'metadata_modified desc',
@@ -124,10 +124,9 @@ class JsonCatalogController(BaseController):
             return toolkit.get_action(action)(data_dict=datadict)['results']
         elif _content_of.lower() == 'datasets':
             datadict = {'sort': 'metadata_modified desc',
-                        'id': '',
                         'rows': 5000}
             action = u'package_search'
-            return toolkit.get_action(action)(data_dict=datadict)['results']
+            return toolkit.get_action(action)(data_dict=datadict)
         elif _content_of.lower() == 'groups':
             datadict = {'all_fields': True}
             action = u'group_list'
@@ -153,7 +152,7 @@ class JsonCatalogController(BaseController):
                 for k, v in mapped_dataset.items():
                     if u'@distributions' == unicode(v):
                         mapped_dataset.update({k: self.map_distribution(self.get_themes())})
-        except (AttributeError, TypeError, KeyError),  e:
+        except (AttributeError, TypeError, KeyError) as e:
             logger.error('++ {}'.format(e))
         return mapped_datasets
 
@@ -199,7 +198,7 @@ class JsonCatalogController(BaseController):
         mapped_distributions = []
         try:
             mapped_distributions = self.mappers.apply(_dataset, _mapper='distributions')
-        except (AttributeError, TypeError, KeyError), e:
+        except (AttributeError, TypeError, KeyError) as e:
             logger.error('[mapper.distributions] {}'.format(e))
         return mapped_distributions
 
@@ -224,6 +223,15 @@ class JsonCatalogController(BaseController):
             logger.error('-- {}'.format(e))
 
         return mapped_themes
+
+    def get_themes(self):
+        """
+        Obtener lista de grupos contenidos dentro de CKAN.
+        Returns:
+          - List(). Len(list) == n: Lista de los n grupos existentes en CKAN.
+          - List(). Len(list) == 0: si ocurrio un error o no se han cargado grupos.
+        """
+        return self.get_ckan_data(_content_of='groups')
 
     @staticmethod
     def build_response(_json_data):
