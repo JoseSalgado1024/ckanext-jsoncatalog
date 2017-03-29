@@ -93,7 +93,7 @@ class Mappers(object):
                 if result:
                     self.__dict__[mapper] = json.load(open(mfs))
                     if mapper == 'dataset':
-                        self.__dict__[mapper]['fields'].update({'$$__TEMP___distribution': 'resources'})
+                        self.__dict__[mapper]['fields'].update({'$$__TEMP__distribution': 'resources'})
             except IOError:
                 logger.critical('Fallo la carga del mapper: {}.'.format(mapper))
             except ValueError:
