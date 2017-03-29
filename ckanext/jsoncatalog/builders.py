@@ -26,6 +26,7 @@ class CKANWrapper(object):
         Returns:
             - Dict.
         """
+
         def translate_list(_d, _listname):
             if _listname in _d:
                 l = _d[_listname]
@@ -52,7 +53,7 @@ class CKANWrapper(object):
         if section.lower() == 'dataset':
             return translate_list(translate_list(translate_extras(data), 'groups'), 'tags')
 
-    def get_ckan_data(self, dataset_id=''):
+    def get_ckan_data(self):
         """
         Metodo unico para seleccionar las diferentes partes de la metadata de CKAN.
 
@@ -76,10 +77,6 @@ class CKANWrapper(object):
                              'rows': 5000},
                 'sub_key': 'results'
             },
-            'distributions': {
-                'action': 'package_search',
-                'datadict': {'all_fields': False, 'q': '_val_:resources'}
-            },
             'themeTaxonomy': {
                 'action': 'group_list',
                 'datadict': {'all_fields': True}
@@ -91,11 +88,10 @@ class CKANWrapper(object):
                                              'distributions',
                                              'themetaxonomy']:
             raise ValueError
-        if not isinstance(dataset_id, (str, unicode)):
-            raise TypeError
         sel_action = action_mapper[self.wrapper_type]['action']
         _data_dict = action_mapper[self.wrapper_type]['datadict']
         self.logs.info('toolkit.get_action(\'{}\')({})'.format(sel_action, _data_dict))
+
         import ckan.plugins.toolkit as toolkit
 
         _raw_data = toolkit.get_action(sel_action)(data_dict=_data_dict)
@@ -113,12 +109,31 @@ class CKANWrapper(object):
     def post_map(self, _data):
         return _data
 
+    def clean_temp_keys(self, _d):
+        """
+
+        :return:
+        """
+        if isinstance(_d, list):
+            list_of_elem = []
+            for e in _d:
+                list_of_elem.append(self.clean_temp_keys(e))
+            _d = list_of_elem
+        if isinstance(_d, dict):
+            for e in _d.keys():
+                if '$$__TEMP__' in e:
+                    del _d[e]
+        return _d
+
     def build(self):
         """
 
         :return:
         """
-        return self.post_map(self._map(self.get_ckan_data()))
+        data = self.get_ckan_data()
+        mapped_data = self._map(data)
+        post_map_data = self.post_map(mapped_data)
+        return self.clean_temp_keys(post_map_data)
 
     def render(self):
         """
@@ -175,10 +190,12 @@ class Dataset(CKANWrapper):
     def post_map(self, _data):
         for i in range(len(_data)):
             for destination, origin in _data[i].items():
-                pass
-                #if origin.lower() == '@distributions':
-                    #_data[i].update({destination: Distribution(mapper=self.mapper_name,
-                    #                                           version=self.mapper_version).render()})
+                if isinstance(origin, (str, unicode)):
+                    if origin.lower() == '@distributions':
+                        _data[i].update({destination: Distribution(mapper=self.mapper_name,
+                                                                   version=self.mapper_version,
+                                                                   distribution=_data[i][
+                                                                       '$$__TEMP__distribution']).render()})
         return _data
 
 
@@ -193,12 +210,15 @@ class ThemeTaxonomy(CKANWrapper):
                                             _version=version)
 
 
-
 class Distribution(CKANWrapper):
-    def __init__(self, mapper='default', version='1.0'):
+    def __init__(self, mapper='default', version='1.0', distribution=None):
         """
         Init de la clase Distribution().
         """
+        self.distribution_raw = distribution
         super(Distribution, self).__init__(_wrapper_type='distribution',
                                            _mapper=mapper,
                                            _version=version)
+
+    def get_ckan_data(self):
+        return self.distribution_raw
