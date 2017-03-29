@@ -4,7 +4,7 @@ from pylons import response
 from ckan.lib.base import BaseController
 from ckan.config.environment import config as ckan_config
 from mappers import *
-
+from builders import Catalog, Dataset, ThemeTaxonomy
 
 logger = logging.getLogger('jsoncatalog.controller')
 
@@ -242,3 +242,7 @@ class JsonCatalogController(BaseController):
         del response.headers["Cache-Control"]
         del response.headers["Pragma"]
         return plugins.toolkit.literal(json.dumps(data))
+
+    def test_responses(self):
+        c = Catalog()
+        return self.build_response(c.render())

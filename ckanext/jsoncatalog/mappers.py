@@ -92,6 +92,8 @@ class Mappers(object):
                 result = self.validate_mapper(mfs)
                 if result:
                     self.__dict__[mapper] = json.load(open(mfs))
+                    if mapper == 'dataset':
+                        self.__dict__[mapper]['fields'].update({'$$__TEMP___distribution': 'resources'})
             except IOError:
                 logger.critical('Fallo la carga del mapper: {}.'.format(mapper))
             except ValueError:
@@ -153,12 +155,14 @@ class Mappers(object):
         selected_mapper = self.__dict__[_mapper]
 
         if isinstance(data, list):
-            list_of_item = []
+            list_of_items = []
             for o in data:
-                list_of_item.append(map_obj(o, selected_mapper))
-            return list_of_item
+                list_of_items.append(self.apply(data=o, _mapper=_mapper))
+                #  list_of_item.append(map_obj(o, selected_mapper))
+            return list_of_items
         elif isinstance(data, dict):
             return map_obj(data, selected_mapper)
+
         else:
             raise TypeError('Tipo de dato provisto no valido.')
 

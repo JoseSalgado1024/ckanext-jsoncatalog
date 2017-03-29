@@ -40,5 +40,9 @@ class JsoncatalogPlugin(plugins.SingletonPlugin):
                       JsoncatalogPlugin.theme_taxonomy_url,
                       controller='ckanext.jsoncatalog.plugin:JsonCatalogController',
                       action='generate_theme_taxonomy')
+            m.connect('test_responses',
+                      '/test.json',
+                      controller='ckanext.jsoncatalog.plugin:JsonCatalogController',
+                      action='test_responses')
             return m
 

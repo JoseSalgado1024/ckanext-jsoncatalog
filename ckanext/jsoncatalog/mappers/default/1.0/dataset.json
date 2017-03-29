@@ -6,6 +6,8 @@
     "landingPage": "name",
     "issued": "metadata_created",
     "modified": "metadata_modified",
+    "theme": "groups__name",
+    "keywords": "tags__name",
     "accrualPeriodicity": "extras__accrualPeriodicity",
     "distribution": "@distributions",
     "description": "notes"
