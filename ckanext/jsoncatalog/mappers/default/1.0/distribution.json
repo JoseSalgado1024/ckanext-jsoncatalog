@@ -1,15 +1,18 @@
 {
   "fields":{
-    "title": "",
-    "description": "",
-    "issued": "",
-    "format": "",
-    "modified": "",
+    "title": "name",
+    "description": "description",
+    "issued": "created",
+    "mimetype": "mimetype",
+    "format": "format",
+    "modified": "last_modified",
     "license": "",
     "accessURL": "",
-    "downloadURL": ""
+    "downloadURL": "url"
   },
   "required":[],
-  "patterns":{},
+  "patterns":{
+    "accessURL": "@site_url/dataset/**package_id/resource/**id"
+  },
   "defaults":{}
 }
