@@ -1,19 +1,11 @@
-"""Tests for plugin.py."""
-import ckanext.jsoncatalog.plugin as plugin
-from ckanext.jsoncatalog.mappers import Mappers
-from ckanext.jsoncatalog.formaters import WildCards
-from ckan.config.environment import config
-# from ckanext.jsoncatalog.controller import JsonCatalogController
-# from ckan.tests import factories
-from os import path
-from nose.tools import *
-
-
 """
 
  Tests para clase Mappers.
 
 """
+from ckanext.jsoncatalog.mappers import Mappers
+from os import path
+from nose.tools import *
 
 
 def test_load_mappers():
@@ -53,6 +45,7 @@ def test_mappers_class_init_cls_load_not_exists_version():
 
     """
     mappers = Mappers(schema='default', version='no.existe')
+    mappers.apply(data='no_existe', _mapper='no_existe')
 
 
 @raises(IOError)
@@ -114,5 +107,5 @@ def test_mappers_class_invalid_mapper():
     mappers.load(schema='default', version='1.0')
     plugin_path = path.dirname(__file__).replace('/tests', '')
     for mapper in mappers.__dict__.keys():
-        mp = path.join(plugin_path, 'mappers/default/1.0/no_existe.json')
+        mp = path.join(plugin_path, 'mappers/default/1.0/no_existe_{}.json'.format(mapper))
         assert_equals(mappers.validate_mapper(mp), False)
