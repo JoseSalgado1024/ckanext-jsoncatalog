@@ -7,7 +7,6 @@ python:
 env:
     - PGVERSION=9.1 CKAN_BRANCH=master
     - PGVERSION=9.1 CKAN_BRANCH=release-v2.3-latest
-    - PGVERSION=9.1 CKAN_BRANCH=release-v2.4-latest
     - PGVERSION=9.1 CKAN_BRANCH=release-v2.5-latest
 
 install:
