@@ -30,10 +30,7 @@ def test_get_groups_is_list():
 
     """
     catalog = Catalog()
-    print 'get groups'
-    print type(catalog.get_ckan_data('groups'))
-    print catalog.get_ckan_data('groups')
-    assert_equals(isinstance(catalog.get_ckan_data('groups'), list), True)
+    assert_equals(isinstance(catalog.get_ckan_data(), list), True)
 
 
 def test_get_datasets_is_list():
@@ -43,4 +40,4 @@ def test_get_datasets_is_list():
 
     """
     catalog = Catalog()
-    assert_equals(isinstance(catalog.get_ckan_data('datasets'), list), True)
+    assert_equals(isinstance(catalog.get_ckan_data(), list), True)
