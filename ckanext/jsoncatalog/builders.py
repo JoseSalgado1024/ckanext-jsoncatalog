@@ -97,8 +97,8 @@ class CKANWrapper(object):
         _raw_data = toolkit.get_action(sel_action)(data_dict=_data_dict)
         try:
             elem_list = _raw_data[action_mapper[self.wrapper_type]['sub_key']]
-            for i in range(len(elem_list)):
-                elem_list[i] = self.translations(data=elem_list[i], section=self.wrapper_type)
+            for i, v in enumerate(elem_list):
+                elem_list[i] = self.translations(data=v, section=self.wrapper_type)
             return elem_list
         except KeyError:
             return _raw_data
@@ -188,8 +188,8 @@ class Dataset(CKANWrapper):
                                       _version=version)
 
     def post_map(self, _data):
-        for i in range(len(_data)):
-            for destination, origin in _data[i].items():
+        for i, v in enumerate(_data):
+            for destination, origin in v.items():
                 if isinstance(origin, (str, unicode)):
                     if origin.lower() == '@distributions':
                         _data[i].update({destination: Distribution(mapper=self.mapper_name,
