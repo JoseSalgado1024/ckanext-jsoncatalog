@@ -1,7 +1,6 @@
 # -*- coding: utf8 -*-
 
 from ckan.config.environment import config
-import arrow
 
 
 class WildCards(object):
