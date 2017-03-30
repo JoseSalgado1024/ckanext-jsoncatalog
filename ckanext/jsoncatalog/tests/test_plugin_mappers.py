@@ -114,5 +114,5 @@ def test_mappers_class_invalid_mapper():
     mappers.load(schema='default', version='1.0')
     plugin_path = path.dirname(__file__).replace('/tests', '')
     for mapper in mappers.__dict__.keys():
-        mp = path.join(plugin_path, 'mappers/default/1.0/no_existe.json'.format(mapper))
+        mp = path.join(plugin_path, 'mappers/default/1.0/no_existe.json')
         assert_equals(mappers.validate_mapper(mp), False)
