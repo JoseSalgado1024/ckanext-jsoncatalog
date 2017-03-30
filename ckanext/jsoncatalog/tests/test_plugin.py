@@ -14,4 +14,5 @@ def test_plugin_load():
     Test 11: Cargar el plugin.
 
     """
-    plugin.plugins.load('jsoncatalog')
+    plugin.plugins.unload('jsoncatalog')
+
