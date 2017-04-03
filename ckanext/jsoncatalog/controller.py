@@ -1,10 +1,9 @@
 import ckan.plugins as plugins
-import ckan.plugins.toolkit as toolkit
 from pylons import response
 from ckan.lib.base import BaseController
 from ckan.config.environment import config as ckan_config
 from mappers import *
-from builders import Catalog, Dataset, ThemeTaxonomy
+from builders import Catalog, ThemeTaxonomy
 
 logger = logging.getLogger('jsoncatalog.controller')
 
@@ -19,11 +18,8 @@ class JsonCatalogController(BaseController):
         plugin_folder = path.dirname(__file__)
         self.mappers_folder = path.join(plugin_folder, 'mappers')
 
-        mapper = ckan_config.get('ckanext.json_catalog.schema', 'default')
-        mapper_version = ckan_config.get('ckanext.json_catalog.version', '1.0')
-
-        self.mappers = Mappers(schema=mapper, version=mapper_version)
-        self.wildcards = WildCards()
+        self.mapper_name = ckan_config.get('ckanext.json_catalog.schema', 'default')
+        self.mapper_version = ckan_config.get('ckanext.json_catalog.version', '1.0')
 
     def generate_catalog(self):
         """
@@ -44,7 +40,8 @@ class JsonCatalogController(BaseController):
             'message': ''
         }
         try:
-            return self.build_response(self.map_catalog(self.get_catalog()))
+            my_catalog = Catalog(mapper=self.mapper_name, version=self.mapper_version)
+            return self.build_response(my_catalog.render())
         except KeyError:
             err_response.update({'message': 'Faltan Parametros requerido.'})
         except ValueError:
@@ -67,8 +64,8 @@ class JsonCatalogController(BaseController):
         }
         thm_txnm = []
         try:
-            thm_txnm = self.map_themes(self.get_themes())
-            return self.build_response(thm_txnm)
+            thm_txnm = ThemeTaxonomy()
+            return self.build_response(thm_txnm.render())
         except KeyError as e:
             _response['message'] = 'Falta parametro {} requerido.'.format(e)
         except ValueError as e:
@@ -77,161 +74,6 @@ class JsonCatalogController(BaseController):
             if len(_response['message']) < 0:
                 _response = thm_txnm
         return self.build_response(_response)
-
-    def get_catalog(self):
-        """
-        Obtiene informacion del catalogo.
-
-        Retunrs:
-            - Dict.
-        """
-
-        return self.get_ckan_data(_content_of='catalog')
-
-    def map_catalog(self, _catalog):
-        """
-
-        Returns:
-            Dict():
-                - {}(vacio), ante Fallo.
-                - {catalogo}, Exito.
-
-        """
-        mapped_catalogs = {}
-        try:
-            mapped_catalogs = self.mappers.apply(data=_catalog, _mapper='catalog')
-            for k, v in mapped_catalogs.items():
-                if u'@datasets' == unicode(v):
-                    mapped_catalogs.update({k: self.map_dataset(self.get_datasets())})
-                if u'@themeTaxonomy' == unicode(v):
-                    mapped_catalogs.update({k: self.map_themes(self.get_themes())})
-        except (AttributeError, TypeError, KeyError) as e:
-            logger.error('>> {}'.format(e))
-        return mapped_catalogs
-
-    @staticmethod
-    def get_ckan_data(_content_of='catalog', dataset_id=None):
-
-        if _content_of.lower() == 'catalog':
-            datadict = {'sort': 'metadata_modified desc',
-                        'rows': 5000}
-            action = u'package_search'
-            return toolkit.get_action(action)(data_dict=datadict)
-        elif _content_of.lower() == 'distributions':
-            datadict = {'sort': 'metadata_modified desc',
-                        'rows': 5000}
-            action = u'package_search'
-            return toolkit.get_action(action)(data_dict=datadict)['results']
-        elif _content_of.lower() == 'datasets':
-            datadict = {'sort': 'metadata_modified desc',
-                        'rows': 5000}
-            action = u'package_search'
-            return toolkit.get_action(action)(data_dict=datadict)
-        elif _content_of.lower() == 'groups':
-            datadict = {'all_fields': True}
-            action = u'group_list'
-            return toolkit.get_action(action)(data_dict=datadict)
-        else:
-            raise AttributeError
-
-    def get_datasets(self):
-        """
-        Obtener lista de datasets contenidos dentro de CKAN.
-
-        Returns:
-            - List(). Len(list) == n: Lista de los n Dataset existentes en CKAN.
-            - List(). Len(list) == 0: si ocurrio un error o no se han cargado datasets.
-        """
-        return self.get_ckan_data(_content_of='datasets')
-
-    def map_dataset(self, _datasets):
-        mapped_datasets = []
-        try:
-            mapped_datasets = self.mappers.apply(_datasets, _mapper='dataset')
-            for mapped_dataset in mapped_datasets:
-                for k, v in mapped_dataset.items():
-                    if u'@distributions' == unicode(v):
-                        mapped_dataset.update({k: self.map_distribution(self.get_themes())})
-        except (AttributeError, TypeError, KeyError) as e:
-            logger.error('++ {}'.format(e))
-        return mapped_datasets
-
-    def exists(self, _obj='dataset', _key=None, _value=None):
-        """
-        Busqueda dentro de la data de ckan.
-
-        Args:
-            - _obj:
-            - key_to_search:
-
-        Returns:
-             - bool():
-                - True, Existe dentro de _obj la clave:_key y posee el valor: _value.
-                - False: No existe dentro de _obj la clave:_key o no posee el valor: _value.
-        """
-        def search_in_dict(d, _k, _v):
-            r = False
-            try:
-                if d[_k] == _v:
-                    r = True
-            except IndexError:
-                pass
-            return r
-
-        # si _key o _value es None, retorno false.
-        results = False
-        if None in [_key, _value]:
-            return results
-        data = self.get_ckan_data(_obj)
-        if isinstance(data, list):
-            for elem in data:
-                results = search_in_dict(elem, _key, _value)
-                if results:
-                    break
-        elif isinstance(data, dict):
-            results = search_in_dict(data, _key, _value)
-        else:
-            return results
-        return results
-
-    def map_distribution(self, _dataset):
-        mapped_distributions = []
-        try:
-            mapped_distributions = self.mappers.apply(_dataset, _mapper='distributions')
-        except (AttributeError, TypeError, KeyError) as e:
-            logger.error('[mapper.distributions] {}'.format(e))
-        return mapped_distributions
-
-    def get_dataset(self, dataset_id=None):
-        """
-        Obtener diccionario con el contenido del dataset.
-
-        Returns:
-          - dict(). Len(dict) == n: Lista de los n grupos existentes en CKAN.
-          - dict(). Len(dict) == 0: si ocurrio un error o no se han cargado dataset.
-        """
-        _dataset = {}
-        if dataset_id in [None]:
-            return _dataset
-        return self.get_ckan_data(_content_of='distributions')
-
-    def map_themes(self, _themes):
-        mapped_themes = []
-        try:
-            mapped_themes = self.mappers.apply(_themes, _mapper='themeTaxonomy')
-        except (AttributeError, TypeError, KeyError) as e:
-            logger.error('-- {}'.format(e))
-
-        return mapped_themes
-
-    def get_themes(self):
-        """
-        Obtener lista de grupos contenidos dentro de CKAN.
-        Returns:
-          - List(). Len(list) == n: Lista de los n grupos existentes en CKAN.
-          - List(). Len(list) == 0: si ocurrio un error o no se han cargado grupos.
-        """
-        return self.get_ckan_data(_content_of='groups')
 
     @staticmethod
     def build_response(_json_data):
@@ -243,6 +85,3 @@ class JsonCatalogController(BaseController):
         del response.headers["Pragma"]
         return plugins.toolkit.literal(json.dumps(data))
 
-    def test_responses(self):
-        c = Catalog()
-        return self.build_response(c.render())
