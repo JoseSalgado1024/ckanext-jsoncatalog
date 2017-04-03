@@ -3,6 +3,7 @@
 
 """
 from ckanext.jsoncatalog.controller import *
+import ckan.plugins.toolkit as toolkit
 logger = logging.getLogger('jsoncatalog')
 
 
