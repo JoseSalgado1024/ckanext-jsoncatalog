@@ -123,14 +123,21 @@ class Mappers(object):
         Returns:
             - TODO!
         """
+        def fill_values(_pattern):
+            for key in data.keys():
+                f = '**{}**'.format(key)
+                if f in _pattern:
+                    _pattern = _pattern.replace(f, data[key])
+            return _pattern
 
         def map_obj(_obj, mapper_selected):
             mapped_object = {}
             for destination, origin in mapper_selected['fields'].items():
                 try:
                     if destination in mapper_selected['patterns'].keys():
-                        pattern = mapper_selected['patterns'][destination]
+                        pattern = fill_values(mapper_selected['patterns'][destination])
                         pattern = wildcards.apply(_phrase=pattern)
+
                         if '@value' in pattern:
                             pattern = pattern.replace('@value', _obj[origin])
                         formated = pattern
@@ -158,7 +165,6 @@ class Mappers(object):
             list_of_items = []
             for o in data:
                 list_of_items.append(self.apply(data=o, _mapper=_mapper))
-                #  list_of_item.append(map_obj(o, selected_mapper))
             return list_of_items
         elif isinstance(data, dict):
             return map_obj(data, selected_mapper)
