@@ -1,7 +1,6 @@
 # -*- coding: utf8 -*-
 
 from ckan.config.environment import config
-import arrow
 
 
 class WildCards(object):
@@ -13,26 +12,6 @@ class WildCards(object):
         self.site_url = config.get('ckan.site_url', 'http://127.0.0.1:5000')
         self.site_title = config.get('ckan.site_title', 'No definido')
         self.site_description = config.get('ckan.site_description', 'No definido')
-
-    @property
-    def actual_date(self):
-        """
-        Date Actual.
-        Returns:
-            - Date-ISO8601. Str()
-        """
-        return arrow.now().format('YYYY-MM-DD_HH:ss:mm')
-
-    @property
-    def dataset_counter(self):
-        """
-        Cantidad de Datasets en la plataforma.
-
-        Returns:
-            - Int().
-
-        """
-        return 0
 
     def list(self):
         return [wildcard for wildcard in self.__dict__.keys()]

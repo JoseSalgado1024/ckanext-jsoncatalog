@@ -3,6 +3,9 @@ import logging
 import json
 from os import path
 from formaters import *
+from jsonschema.exceptions import *
+import jsonschema
+
 logger = logging.getLogger(__name__)
 
 
@@ -16,10 +19,37 @@ class Mappers(object):
         self.dataset = ''
         self.distribution = ''
         self.themeTaxonomy = ''
-        if not self._load(schema, version):
+        if not self.load(schema, version):
             raise IOError('Imposble cargar mappers.')
 
-    def _load(self, schema, version):
+    def validate_mapper(self, mapper_path):
+        """
+        Validacion de mappers.
+
+        Returns:
+            - Bool:
+                - True: Es un mapper valido.
+                - False: No es un mapper valido.
+        """
+        try:
+            sv_path = path.join(path.dirname(__file__), 'validators/schema.validator.json')
+            _valid_schema = json.load(open(sv_path))
+            _mapper, _format = path.basename(mapper_path).split('.')
+            if _mapper not in self.__dict__.keys():
+                raise KeyError
+            if _format.lower() not in ['json']:
+                raise TypeError
+            if not path.exists(mapper_path):
+                raise IOError
+            _loaded_mapper = json.load(open(mapper_path))
+            jsonschema.validate(_loaded_mapper, _valid_schema)
+            return True
+        except (IOError, KeyError):
+            return False
+        except ValidationError:
+            return False
+
+    def load(self, schema, version):
         """
         Carga las diferentes reglas de mapeos.
 
@@ -44,7 +74,6 @@ class Mappers(object):
              - None: Fallo la carga de Mappers.
         """
         result = False
-        err_list = []
         wrk_folder = path.dirname(__file__)
         mappers_folder = path.join('mappers', '{schema}/{version}'.format(schema=schema,
                                                                           version=version))
@@ -52,26 +81,27 @@ class Mappers(object):
 
         # Chequeo que exista el schema seleccionado.
         if not path.exists(abs_path_mappers):
-              raise IOError
+            raise IOError
 
         # Chequeo que existan todas la partes requeridas del schema.
         # dataset, distribution, catalog y themeTaxonomy
-
+        load_results = []
         for mapper in self.__dict__.keys():
             mfs = path.join(abs_path_mappers, '{}.json'.format(mapper))
             try:
-                self.__dict__[mapper] = json.load(open(mfs))
-                result = True
+                result = self.validate_mapper(mfs)
+                if result:
+                    self.__dict__[mapper] = json.load(open(mfs))
+                    if mapper == 'dataset':
+                        self.__dict__[mapper]['fields'].update({'$$__TEMP__distribution': 'resources'})
             except IOError:
-                err_list.append('Fallo la carga del mapper: {}.'.format(mapper))
+                logger.critical('Fallo la carga del mapper: {}.'.format(mapper))
             except ValueError:
-                err_list.append('No es posible decodificar el mapper {}, no es JSON valido'.format(mapper))
+                logger.critical('No es posible decodificar el mapper {}, no es JSON valido'.format(mapper))
+            load_results.append(result)
+        return False not in load_results
 
-            if len(err_list) > 0:
-                logger.critical('\n'.join(err_list))
-            return result
-
-    def _available_mappers(self):
+    def available_mappers(self):
         """
         Listado de mappers disponobles.
 
@@ -83,14 +113,14 @@ class Mappers(object):
         """
         return [mapper for mapper in self.__dict__.keys()]
 
-    def apply(self, data=None,  _mapper='catalog'):
+    def apply(self, data=None, _mapper='catalog'):
         """
-        Aplica un mapeo de datos preconfigurado.
+        Aplica un mapeo de datos pre-configurado.
 
         Args:
             - _mapper:
 
-        Retunrs:
+        Returns:
             - TODO!
         """
 
@@ -114,20 +144,25 @@ class Mappers(object):
                     if destination not in selected_mapper['required']:
                         pass
                     else:
-                        raise KeyError
+                        pass
             return mapped_object
 
         if data in [None]:
             raise TypeError('El campo \"data\" no admite el tipo: {}'.format(type(data)))
-        if _mapper not in self._available_mappers():
+        if _mapper not in self.available_mappers():
             raise AttributeError('El mapper \"{}\" no existe.'.format(_mapper))
         wildcards = WildCards()
         selected_mapper = self.__dict__[_mapper]
 
         if isinstance(data, list):
-            return [map_obj(obj, selected_mapper) for obj in data]
+            list_of_items = []
+            for o in data:
+                list_of_items.append(self.apply(data=o, _mapper=_mapper))
+                #  list_of_item.append(map_obj(o, selected_mapper))
+            return list_of_items
         elif isinstance(data, dict):
             return map_obj(data, selected_mapper)
+
         else:
             raise TypeError('Tipo de dato provisto no valido.')
 
@@ -144,4 +179,3 @@ class Mappers(object):
 
     def __setattr__(self, key, value):
         self.__dict__[key] = value
-

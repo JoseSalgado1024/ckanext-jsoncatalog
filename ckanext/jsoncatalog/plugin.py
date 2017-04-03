@@ -2,7 +2,7 @@
 """
 
 """
-from controller import *
+from ckanext.jsoncatalog.controller import *
 logger = logging.getLogger('jsoncatalog')
 
 
@@ -24,11 +24,7 @@ class JsoncatalogPlugin(plugins.SingletonPlugin):
         """
         JsoncatalogPlugin.plugin_is_enable = config_.get("ckanext.json_catalog.is_active", "True") == 'True'
         JsoncatalogPlugin.catalog_url = config_.get("ckanext.json_catalog.uri", "/catalog.json")
-        JsoncatalogPlugin.mapper = config_.get("ckanext.json_catalog.schema", "default")
-        JsoncatalogPlugin.version = config_.get("ckanext.json_catalog.version", "1.0")
         JsoncatalogPlugin.theme_taxonomy_url = config_.get("ckanext.json_catalog.uri", "/themeTaxonomy.json")
-        plugin_folder = path.dirname(__file__)
-        JsoncatalogPlugin.mappers_folder = path.join(plugin_folder, 'mappers')
         toolkit.add_template_directory(config_, 'templates')
 
     def before_map(self, m):
@@ -44,5 +40,9 @@ class JsoncatalogPlugin(plugins.SingletonPlugin):
                       JsoncatalogPlugin.theme_taxonomy_url,
                       controller='ckanext.jsoncatalog.plugin:JsonCatalogController',
                       action='generate_theme_taxonomy')
+            m.connect('test_responses',
+                      '/test.json',
+                      controller='ckanext.jsoncatalog.plugin:JsonCatalogController',
+                      action='test_responses')
             return m
 
