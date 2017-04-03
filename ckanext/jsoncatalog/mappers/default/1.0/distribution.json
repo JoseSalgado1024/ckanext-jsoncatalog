@@ -12,7 +12,7 @@
   },
   "required":[],
   "patterns":{
-    "accessURL": "@site_url/dataset/**package_id/resource/**id"
+    "accessURL": "@site_url/dataset/**package_id**/resource/**id**"
   },
   "defaults":{}
 }

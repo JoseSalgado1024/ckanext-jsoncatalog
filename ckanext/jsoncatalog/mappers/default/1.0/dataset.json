@@ -3,7 +3,7 @@
     "title": "title",
     "license": "license_title",
     "identifier": "id",
-    "landingPage": "name",
+    "landingPage": "",
     "issued": "metadata_created",
     "modified": "metadata_modified",
     "theme": "groups__name",
@@ -14,7 +14,7 @@
   },
   "required": ["title", "license", "identifier", "issued", "description"],
   "patterns":{
-    "landingPage": "@site_url/dataset/@value"
+    "landingPage": "@site_url/dataset/**name**"
   },
   "defaults":{}
 }
